@@ -1,0 +1,17 @@
+[
+    {
+        "class": "cron.update_moovijob_job_offers.UpdateMoovijobJobOffers",
+        "cron": "07:00",
+        "config": {}
+    },
+    {
+        "class": "cron.update_moovijob_job_offers.UpdateMoovijobJobOffers",
+        "cron": "12:30",
+        "config": {}
+    },
+    {
+        "class": "cron.example_cron.ExampleCron",
+        "cron": "*:46",
+        "config": {}
+    }
+]
