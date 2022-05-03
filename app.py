@@ -8,7 +8,6 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from flask_apispec.extension import FlaskApiSpec
 from threading import Thread
 from engine.engine import Engine
-from resource.execute_command import ExecuteCommand
 
 from db.db import DB
 
@@ -16,13 +15,13 @@ from db.db import DB
 from dotenv import load_dotenv
 load_dotenv()
 
-from config import config # pylint: disable=wrong-import-position
+from config import config  # pylint: disable=wrong-import-position
 
 # Manage DB connection
 db_uri = URL(**config.DB_CONFIG)
 
 # Init Flask and set config
-app = Flask(__name__, template_folder="template")
+app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -43,7 +42,7 @@ app.config['SCHEDULER_API_ENABLED'] = False
 app.config['APISPEC_SWAGGER_URL'] = '/doc/json'
 app.config['APISPEC_SWAGGER_UI_URL'] = '/doc/'
 app.config['APISPEC_SPEC'] = APISpec(
-    title='CYBERLUX CRON API',
+    title='CYBERLUX CRON ENGINE',
     version='v0.1',
     plugins=[MarshmallowPlugin()],
     openapi_version='2.0.0'
@@ -62,11 +61,6 @@ api = Api(app)
 
 # Init cron manager
 engine = Engine(db)
-api.add_resource(
-    ExecuteCommand,
-    "/execute_command/<command>",
-    resource_class_kwargs={"engine": engine}
-)
 cron_manager = Thread(target=engine.run)
 cron_manager.start()
 
@@ -78,7 +72,7 @@ def undefined_route(_):
 
 if __name__ in ('app', '__main__'):
     from routes import set_routes
-    set_routes({"api": api, "db": db, "docs": docs})
+    set_routes({"api": api, "db": db, "docs": docs, "engine": engine})
 
     app.debug = config.ENVIRONMENT == "dev"
 

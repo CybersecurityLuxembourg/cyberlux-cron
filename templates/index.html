@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>{% block title %} CYBERLUX cron manager {% endblock %}</h1>
+
+    <div>Server status: {{ status }}</div>
+    <div>Number of threads: {{ thread_count }}</div>
+    <div>Number of workers: {{ worker_count }}</div>
+
+{% endblock %}

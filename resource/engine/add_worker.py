@@ -1,16 +1,19 @@
+from flask_apispec import MethodResource
+from flask_apispec import doc
 from flask_restful import Resource
 from queue import Queue
 
 
-class ExecuteCommand(Resource):
+class AddWorker(MethodResource, Resource):
 
     def __init__(self, engine):
         self.engine = engine
 
-    def get(self, command):
+    @doc(tags=['engine'])
+    def post(self):
         try:
             message_queue = Queue(1)
-            self.engine.queue.put((message_queue, command))
+            self.engine.queue.put((message_queue, "ADD_WORKER"))
             res = message_queue.get(timeout=1)
             del message_queue
         except Exception as e:
