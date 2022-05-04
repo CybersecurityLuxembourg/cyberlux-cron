@@ -21,7 +21,7 @@ from config import config  # pylint: disable=wrong-import-position
 db_uri = URL(**config.DB_CONFIG)
 
 # Init Flask and set config
-app = Flask(__name__)
+app = Flask(__name__, static_folder="templates/static")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False

@@ -11,7 +11,7 @@
     },
     {
         "class": "cron.example_cron.ExampleCron",
-        "cron": "*:46",
+        "cron": "*:53",
         "config": {}
     }
 ]

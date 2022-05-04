@@ -17,5 +17,7 @@ class AddWorker(MethodResource, Resource):
             res = message_queue.get(timeout=1)
             del message_queue
         except Exception as e:
-            raise e
+            del message_queue
+            return str(e), 200
+
         return res, 200

@@ -2,20 +2,22 @@
 # flake8: noqa: F401
 import inspect
 import sys
-from resource.front_app import FrontApp
+from resource.webapp.get_index import GetIndex
 from resource.engine.add_worker import AddWorker
 from resource.engine.get_thread_count import GetThreadCount
 from resource.engine.get_worker_count import GetWorkerCount
+from resource.log.get_cron_log import GetCronLog
+from resource.module.get_modules import GetModules
 
 
 def set_routes(*args):
 
     plugins = args[0]
 
-    # Create the root endpoint
+    # Create the webapp endpoints
 
     plugins["api"].add_resource(
-        FrontApp,
+        GetIndex,
         "/",
         resource_class_kwargs={"db": plugins["db"], "engine": plugins["engine"]}
     )
@@ -23,7 +25,7 @@ def set_routes(*args):
     # Build the endpoints imported in this file
 
     classes = inspect.getmembers(sys.modules[__name__], inspect.isclass)
-    classes = [c for c in classes if c[0] != "FrontApp"]
+    classes = [c for c in classes if c[0] != "GetIndex" and c[0] != "GetStatic"]
 
     for res in classes:
 
@@ -50,12 +52,11 @@ def set_routes(*args):
         # Build the args
 
         class_args = {a: plugins[a] for a in inspect.getfullargspec(res[1]).args if a != "self"}
-        print(class_args)
 
         # Add the resource
 
         plugins["api"].add_resource(res[1], endpoint, resource_class_kwargs=class_args)
 
         # Add the resource in the doc
-        print(res)
+
         plugins["docs"].register(res[1], resource_class_kwargs=class_args)

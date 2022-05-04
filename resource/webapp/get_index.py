@@ -6,19 +6,18 @@ from resource.engine.get_worker_count import GetWorkerCount
 from db.db import DB
 
 
-class FrontApp(Resource):
+class GetIndex(Resource):
 
     def __init__(self, db: DB, engine):
         self.db = db
         self.engine = engine
 
     def get(self):
-
         response = make_response(render_template(
             'index.html',
             status=Healthz(self.db).get().status,
-            thread_count=GetThreadCount(self.engine).get().status,
-            worker_count=GetWorkerCount(self.engine).get().status,
+            thread_count=GetThreadCount(self.engine).get().data.decode("utf-8"),
+            worker_count=GetWorkerCount(self.engine).get().data.decode("utf-8"),
         ))
         response.headers['Content-Type'] = 'text/html; charset=ISO-8859-1'
 
