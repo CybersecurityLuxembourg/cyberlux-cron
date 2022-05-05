@@ -1,7 +1,4 @@
 import functools
-import json
-
-import flask
 from flask import Response
 
 
@@ -12,7 +9,8 @@ def log_task(function):
 
         log = {
             "user_id": None,
-            "request": "croncron",
+            "request": '/{}.{}'.format(function.__module__, function.__qualname__)
+                       .replace(".", "/"),
             "request_method": "CRON",
             "params": None,
             "status_code": a.status_code if isinstance(a, Response) else int(str(a[1][0:3])),
