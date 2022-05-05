@@ -6,12 +6,12 @@
     },
     {
         "class": "cron.update_moovijob_job_offers.UpdateMoovijobJobOffers",
-        "cron": "10:50",
+        "cron": "12:00",
         "config": {}
     },
     {
         "class": "cron.example_cron.ExampleCron",
-        "cron": "*:31",
+        "cron": "*:30",
         "config": {}
     }
 ]
