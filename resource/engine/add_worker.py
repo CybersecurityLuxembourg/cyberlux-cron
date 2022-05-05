@@ -2,6 +2,10 @@ from flask_apispec import MethodResource
 from flask_apispec import doc
 from flask_restful import Resource
 from queue import Queue
+from flask_jwt_extended import jwt_required
+
+from decorator.catch_exception import catch_exception
+from decorator.verify_admin_access import verify_admin_access
 
 
 class AddWorker(MethodResource, Resource):
@@ -10,6 +14,9 @@ class AddWorker(MethodResource, Resource):
         self.engine = engine
 
     @doc(tags=['engine'])
+    # @jwt_required
+    # @verify_admin_access
+    @catch_exception
     def post(self):
         try:
             message_queue = Queue(1)

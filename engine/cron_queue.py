@@ -67,8 +67,8 @@ class CronQueue:
         start = time.time()
         self.logger.warning("%s cron %s", current_thread().name, cron_description['class'].__name__)
 
-        my_instance = cron_description["class"](**cron_description["config"])
-        my_instance.run(self.db)
+        my_instance = cron_description["class"](self.db, **cron_description["config"])
+        my_instance.run()
         del my_instance
 
         end = time.time()

@@ -2,36 +2,47 @@
 
 {% block content %}
 
-    <h1>{% block title %} CYBERLUX cron manager {% endblock %}</h1>
-
-    <h2>Status</h2>
-
-    <div>Server status: {{ status }}</div>
-    <div>Number of threads: {{ thread_count }}</div>
-    <div>Number of workers: {{ worker_count }}</div>
-
-    <h2>Modules</h2>
-
-    <div id="modules">
+<div class="row">
+    <div class="col-md-12">
+        <h1>{% block title %} CYBERLUX cron manager {% endblock %}</h1>
     </div>
 
-    <h2>Action</h2>
+    <div class="col-md-6">
+        <h2>Status</h2>
 
-    <button id="add_a_worker">
-        Add a worker
-    </button>
-
-    <h2>Log</h2>
-
-    <div id="logs">
+        <div>Server status: {{ status }}</div>
+        <div>Number of threads: {{ thread_count }}</div>
+        <div>Number of workers: {{ worker_count }}</div>
     </div>
 
-    <button id="refresh_logs">
-        Refresh
-    </button>
+    <div class="col-md-6">
+        <h2>Action</h2>
 
-    <script>
+        <button id="add_a_worker">
+            Add a worker
+        </button>
+    </div>
 
+    <div class="col-md-12">
+        <h2>Modules</h2>
+
+        <div id="modules">
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <h2>Log</h2>
+
+        <div id="logs">
+        </div>
+
+        <button id="refresh_logs">
+            Refresh
+        </button>
+    </div>
+</div>
+
+<script>
     var get_cron = function() {
         $.ajax({
             url: 'log/get_cron_log',
@@ -41,9 +52,7 @@
 
                 for (var i = 0; i < response.items.length; i++) {
                     content += "<div>" + response.items[i].request + "</div>";
-                    console.log(response.items[i]);
                 }
-                console.log(response.items.length, content);
 
                 $("#logs").html(content);
             },
@@ -52,6 +61,23 @@
             }
         });
     };
+
+    var load_run_module_events = function() {
+        $(".run_module").click(function() {
+            $.ajax({
+                url: 'module/run_module',
+                type: 'POST',
+                data: JSON.stringify({'module': $(this).attr("module")}),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+    }
 
     $(document).ready(function() {
         $("#add_a_worker").click(function() {
@@ -80,11 +106,13 @@
                 for (var i = 0; i < response.length; i++) {
                     content += "<div>" + response[i].class + "</div>";
                     content += "<div>" + response[i].cron + "</div>";
-                    console.log(response[i]);
+                    content += "<button class='run_module' module='" + response[i].class + "'>"
+                        + "Run module"
+                        + "</button>";
                 }
-                console.log(response.length, content);
 
                 $("#modules").html(content);
+                load_run_module_events();
             },
             error: function(error){
                 console.log(error);
@@ -93,7 +121,6 @@
     });
 
     get_cron();
-
-    </script>
+</script>
 
 {% endblock %}

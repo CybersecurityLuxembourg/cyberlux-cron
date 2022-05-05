@@ -3,10 +3,12 @@ import json
 import re
 from urllib3 import ProxyManager
 from urllib import request
+from flask import Response
 
 from sqlalchemy import func
 
 from config.config import HTTP_PROXY
+from decorator.log_task import log_task
 
 
 class UpdateMoovijobJobOffers:
@@ -14,6 +16,7 @@ class UpdateMoovijobJobOffers:
     def __init__(self, db):
         self.db = db
 
+    @log_task
     def run(self):  # pylint: disable=too-many-locals
 
         base_url = "https://www.moovijob.com/api/job-offers/search?job_categories[]=informatique-consulting" \
@@ -100,8 +103,10 @@ class UpdateMoovijobJobOffers:
 
         # Send response
 
-        return "", f"200 Success: {count['reviewed']} treated, {count['created']} created, " \
-                   f"{count['modified']} modified, {count['deactivated']} deactivated"
+        status = f"200 Success: {count['reviewed']} treated, {count['created']} created, " \
+            f"{count['modified']} modified, {count['deactivated']} deactivated"
+
+        return Response(status=status)
 
     def _manage_article(self, a, source, company):
         copied_a = copy.deepcopy(a)

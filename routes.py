@@ -8,6 +8,7 @@ from resource.engine.get_thread_count import GetThreadCount
 from resource.engine.get_worker_count import GetWorkerCount
 from resource.log.get_cron_log import GetCronLog
 from resource.module.get_modules import GetModules
+from resource.module.run_module import RunModule
 
 
 def set_routes(*args):
