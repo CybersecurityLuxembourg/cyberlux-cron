@@ -26,19 +26,19 @@
     <div class="col-md-12">
         <h2>Modules</h2>
 
-        <div id="modules">
-        </div>
+        <table id="modules">
+        </table>
     </div>
 
     <div class="col-md-12">
         <h2>Log</h2>
 
-        <div id="logs">
-        </div>
-
         <button id="refresh_logs">
             Refresh
         </button>
+
+        <table id="logs">
+        </table>
     </div>
 </div>
 
@@ -51,7 +51,12 @@
                 var content = "";
 
                 for (var i = 0; i < response.items.length; i++) {
-                    content += "<div>" + response.items[i].request + "</div>";
+                    content += "<tr>";
+                    content += "<td>" + response.items[i].request + "</td>";
+                    content += "<td>" + response.items[i].status_code + "</td>";
+                    content += "<td>" + response.items[i].status_description + "</td>";
+                    content += "<td>" + response.items[i].sys_date + "</td>";
+                    content += "</tr>";
                 }
 
                 $("#logs").html(content);
@@ -104,11 +109,13 @@
                 var content = "";
 
                 for (var i = 0; i < response.length; i++) {
-                    content += "<div>" + response[i].class + "</div>";
-                    content += "<div>" + response[i].cron + "</div>";
-                    content += "<button class='run_module' module='" + response[i].class + "'>"
+                    content += "<tr>";
+                    content += "<td>" + response[i].class + "</td>";
+                    content += "<td>" + response[i].cron + "</td>";
+                    content += "<td><button class='run_module' module='" + response[i].class + "'>"
                         + "Run module"
-                        + "</button>";
+                        + "</button></td>";
+                    content += "</tr>";
                 }
 
                 $("#modules").html(content);

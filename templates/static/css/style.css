@@ -1,4 +1,45 @@
 
 body {
-    padding: 10px 30px;
+    padding: 10px 30px 50px 30px;
+}
+
+h1, h2 {
+    padding: 10px 0px;
+}
+
+table {
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: normal;
+    border: none;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    white-space: nowrap;
+    background-color: white;
+}
+
+table td, table th {
+    text-align: center;
+    padding: 8px;
+}
+
+table td {
+    border-right: 1px solid #f8f8f8;
+    font-size: 12px;
+}
+
+table thead th {
+    color: #ffffff;
+    background: #4FC3A1;
+}
+
+
+table thead th:nth-child(even) {
+    color: #ffffff;
+    background: #324960;
+}
+
+table tr:nth-child(odd) {
+    background: #F8F8F8;
 }
