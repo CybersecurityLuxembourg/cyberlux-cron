@@ -1,6 +1,13 @@
 
 body {
     padding: 10px 30px 50px 30px;
+    width: 100%;
+}
+
+body .row {
+    width: 100%;
+	max-width: 1200px;
+	margin: auto;
 }
 
 h1, h2 {
