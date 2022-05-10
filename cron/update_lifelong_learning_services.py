@@ -31,8 +31,6 @@ class UpdateLifelongLearningServices:
 
         data = json.loads(content)
 
-        external_references = []
-
         count = {
             "reviewed": 0,
             "created": 0,
@@ -53,16 +51,28 @@ class UpdateLifelongLearningServices:
 
         entity = entity[0]
 
+        # Get the 'Training' taxonomy value
+
+        training_tags = self.db.session.query(self.db.tables["TaxonomyValue"]) \
+            .filter(func.lower(self.db.tables["TaxonomyValue"].name).like("Training")) \
+            .filter(func.lower(self.db.tables["TaxonomyValue"].category).like("SERVICE CATEGORY")) \
+            .all()
+
+        if len(training_tags) == 0:
+            return [], "500 'TRAINING' value in the 'SERVICE CATEGORY' taxonomy not found"
+
+        training_tag = training_tags[0]
+
         # Treat the data
 
-        external_references = [str(a["id"]) for a in data["data"]]
+        external_references = [a["id"] for a in data["trainings"]]
 
         db_services = self.db.get(
             self.db.tables["Article"],
             {"external_reference": external_references}
         )
 
-        for source_service in data["data"]:
+        for source_service in data["trainings"]:
 
             db_article = [a for a in db_services if str(source_service["id"]) == a.external_reference]
             db_article = db_article[0] if len(db_article) > 0 else self.db.tables["Article"]()
@@ -70,11 +80,9 @@ class UpdateLifelongLearningServices:
             count["reviewed"] += 1
             count["created"] += 1 if db_article.id is None else 0
 
-            db_article, m1 = self._manage_service(db_article, source_service, entity)
-            db_article_version, m2 = self._manage_article_version(db_article)
-            _, m3 = self._manage_article_version_box(db_article_version, source_service)
+            db_article, m1 = self._manage_service(db_article, source_service, entity, training_tag)
 
-            count["modified"] += 1 if (db_article.id is not None and (m1 or m2 or m3)) else 0
+            count["modified"] += 1 if (db_article.id is not None and m1) else 0
 
         # Deactivate the missing services
 
@@ -87,21 +95,21 @@ class UpdateLifelongLearningServices:
 
         return Response(status=status)
 
-    def _manage_service(self, a, source, company):
+    def _manage_service(self, a, source, entity, training_tag):
         copied_a = copy.deepcopy(a)
 
-        title = self._get_preferred_lang_info(source['title'])
-        handle = f"{source['id']}-{re.sub(r'[^a-z1-9-]', '', title.lower().replace(' ', '-'))[:80]}"
+        handle = f"{source['id']}"
 
         # Insert data into Article object
 
         a.external_reference = source["id"] if a.external_reference is None else a.external_reference
-        a.title = title if a.title is None else a.title
+        a.title = source['title'] if a.title is None else a.title
+        a.description = UpdateLifelongLearningServices._get_description(source) if a.title is None else a.title
         a.handle = handle if a.handle is None else a.handle
-        a.type = "JOB OFFER" if a.type is None else a.type
-        a.publication_date = source["published_at"].split("T")[0] if a.publication_date is None else a.publication_date
+        a.type = "SERVICE" if a.type is None else a.type
+        a.publication_date = source["startDate"].split("T")[0] if a.publication_date is None else a.publication_date
         a.status = "PUBLIC" if a.status is None else a.status
-        a.link = self._get_preferred_lang_info(source["urls"]) if a.link is None else a.link
+        a.link = source["link"] if a.link is None else a.link
         a.is_created_by_admin = True
 
         # Save modifications in DB
@@ -111,17 +119,30 @@ class UpdateLifelongLearningServices:
 
         # Add the Moovijob relationship if it does not exist
 
-        tags = self.db.get(self.db.tables["ArticleCompanyTag"], {"company": company.id, "article": article.id})
+        tags = self.db.get(self.db.tables["ArticleCompanyTag"], {"company": entity.id, "article": article.id})
 
         if len(tags) == 0:
-            self.db.insert({"company": company.id, "article": article.id}, self.db.tables["ArticleCompanyTag"])
+            self.db.insert({"company": entity.id, "article": article.id}, self.db.tables["ArticleCompanyTag"])
+
+        # Add the Training tag if it does not exist
+
+        tags = self.db.get(
+            self.db.tables["ArticleTaxonomyTag"],
+            {"taxonomy_value": training_tag.id, "article": article.id}
+        )
+
+        if len(tags) == 0:
+            self.db.insert(
+                {"taxonomy_value": training_tag.id, "article": article.id},
+                self.db.tables["ArticleTaxonomyTag"]
+            )
 
         return article, is_modified
 
-    def _deactivate_deprecated_services(self, company, external_references):
+    def _deactivate_deprecated_services(self, entity, external_references):
         subquery = self.db.session.query(self.db.tables["ArticleCompanyTag"]) \
             .with_entities(self.db.tables["ArticleCompanyTag"].article) \
-            .filter(self.db.tables["ArticleCompanyTag"].company == company.id) \
+            .filter(self.db.tables["ArticleCompanyTag"].company == entity.id) \
             .subquery()
 
         offers_to_archive = self.db.session.query(self.db.tables["Article"]) \
@@ -137,13 +158,19 @@ class UpdateLifelongLearningServices:
             self.db.merge(offers_to_archive, self.db.tables["Article"])
 
     @staticmethod
-    def _get_preferred_lang_info(lang_dict):
-        if "en" in lang_dict and lang_dict["en"] is not None:
-            return lang_dict["en"]
-        if "fr" in lang_dict and lang_dict["fr"] is not None:
-            return lang_dict["fr"]
-        if "de" in lang_dict and lang_dict["de"] is not None:
-            return lang_dict["de"]
-        if len(lang_dict.keys()) > 0:
-            return lang_dict[list(lang_dict.keys())[0]]
-        return None
+    def _get_description(source):
+        description = ""
+
+        if source["company"] is not None and len(source["company"]) > 0:
+            description += f"Company: {source['company']} \u2014 "
+        if source["durationInHours"] is not None and len(str(source["durationInHours"])) > 0:
+            description += f"Duration in hours: {str(source['durationInHours'])} \u2014 "
+        if source["trainingLevelTitle"] is not None and len(source["trainingLevelTitle"]) > 0:
+            description += f"Level: {source['company']} \u2014 "
+
+        if len(description) > 0:
+            description = description[:-3]
+
+        return description
+
+

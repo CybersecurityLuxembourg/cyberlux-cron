@@ -10,6 +10,11 @@
         "config": {}
     },
     {
+        "class": "cron.update_lifelong_learning_services.UpdateLifelongLearningServices",
+        "cron": "07:00",
+        "config": {}
+    },
+    {
         "class": "cron.example_cron.ExampleCron",
         "cron": "*:30",
         "config": {}
