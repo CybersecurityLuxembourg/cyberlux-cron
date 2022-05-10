@@ -107,7 +107,6 @@ class UpdateLifelongLearningServices:
         a.description = UpdateLifelongLearningServices._get_description(source) if a.title is None else a.title
         a.handle = handle if a.handle is None else a.handle
         a.type = "SERVICE" if a.type is None else a.type
-        a.publication_date = source["startDate"].split("T")[0] if a.publication_date is None else a.publication_date
         a.status = "PUBLIC" if a.status is None else a.status
         a.link = source["link"] if a.link is None else a.link
         a.is_created_by_admin = True
