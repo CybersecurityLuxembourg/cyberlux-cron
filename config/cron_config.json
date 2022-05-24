@@ -11,12 +11,12 @@
     },
     {
         "class": "cron.update_lifelong_learning_services.UpdateLifelongLearningServices",
-        "cron": "07:00",
+        "cron": "07:30",
         "config": {}
     },
     {
-        "class": "cron.example_cron.ExampleCron",
-        "cron": "*:30",
+        "class": "cron.update_lifelong_learning_services.UpdateLifelongLearningServices",
+        "cron": "12:30",
         "config": {}
     }
 ]
