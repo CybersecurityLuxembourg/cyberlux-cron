@@ -14,8 +14,8 @@ class GetThreadCount(MethodResource, Resource):
         self.engine = engine
 
     @doc(tags=['engine'])
-    # @jwt_required
-    # @verify_admin_access
+    @jwt_required
+    @verify_admin_access
     @catch_exception
     def get(self):
         try:

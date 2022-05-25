@@ -16,8 +16,6 @@ class GetIndex(Resource):
         response = make_response(render_template(
             'index.html',
             status=Healthz(self.db).get().status,
-            thread_count=GetThreadCount(self.engine).get().data.decode("utf-8"),
-            worker_count=GetWorkerCount(self.engine).get().data.decode("utf-8"),
         ))
         response.headers['Content-Type'] = 'text/html; charset=ISO-8859-1'
 

@@ -10,12 +10,13 @@ from decorator.verify_admin_access import verify_admin_access
 
 class AddWorker(MethodResource, Resource):
 
-    def __init__(self, engine):
+    def __init__(self, db, engine):
+        self.db = db
         self.engine = engine
 
     @doc(tags=['engine'])
-    # @jwt_required
-    # @verify_admin_access
+    @jwt_required
+    @verify_admin_access
     @catch_exception
     def post(self):
         try:

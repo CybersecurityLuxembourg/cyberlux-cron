@@ -50,3 +50,15 @@ table thead th:nth-child(even) {
 table tr:nth-child(odd) {
     background: #F8F8F8;
 }
+
+#login {
+    height: 100%;
+    width: 100%;
+}
+
+#login > div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

@@ -21,8 +21,8 @@ class GetCronLog(MethodResource, Resource):
         'per_page': fields.Int(required=False, missing=50, validate=validate.Range(min=1, max=50)),
         'order': fields.Str(required=False, missing='desc', validate=lambda x: x in ['desc', 'asc']),
     }, location="query")
-    # @jwt_required
-    # @verify_admin_access
+    @jwt_required
+    @verify_admin_access
     @catch_exception
     def get(self, **kwargs):
 

@@ -21,8 +21,8 @@ class RunModule(MethodResource, Resource):
     @use_kwargs({
         'module': fields.Str(required=True),
     })
-    # @jwt_required
-    # @verify_admin_access
+    @jwt_required
+    @verify_admin_access
     @catch_exception
     def post(self, **kwargs):
 

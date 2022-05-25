@@ -1,0 +1,67 @@
+{% block content %}
+
+<div id="login">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h2>Log in</h2>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <p>Email:</p>
+                </div>
+                <div class="col-md-6">
+                    <input id="email" type="text" name="email" style="width: 100%;"/>
+                </div>
+                <div class="col-md-6">
+                    <p>Password:</p>
+                </div>
+                <div class="col-md-6">
+                    <input id="password" type="password" name="password" style="width: 100%;"/>
+                </div>
+                <div class="col-md-12" style="text-align: right;">
+                    <button id="button-login">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createCookie(name, value, days) {
+        var expires;
+
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        } else {
+            expires = "";
+        }
+        document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+    }
+
+    $("#button-login").click(function() {
+        $.ajax({
+            url: 'account/login',
+            type: 'POST',
+            data: JSON.stringify({
+                'email': $("#email").val(),
+                'password': $("#password").val()
+            }),
+            contentType: 'application/json',
+            success: function(response) {
+                console.log(response);
+                createCookie("access_token_cookie", response.access_token, 1);
+                getModules();
+                getCron();
+                $("#app").css({"display": "block"});
+                $("#login").css({"display": "none"});
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+</script>
+
+{% endblock %}

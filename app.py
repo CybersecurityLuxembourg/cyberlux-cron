@@ -27,6 +27,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["ERROR_404_HELP"] = False
 
+app.config["JWT_SECRET_KEY"] = config.JWT_SECRET_KEY
 app.config["JWT_TOKEN_LOCATION"] = ['headers', 'cookies']
 app.config["JWT_COOKIE_SECURE"] = config.ENVIRONMENT != "dev"
 app.config['JWT_COOKIE_CSRF_PROTECT'] = False

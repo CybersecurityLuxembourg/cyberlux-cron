@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div id="app">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{% block title %} CYBERLUX cron manager {% endblock %}</h1>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Status</h2>
+
+            <div>Server status: {{ status }}</div>
+            <div>Number of threads: {{ thread_count }}</div>
+            <div>Number of workers: {{ worker_count }}</div>
+        </div>
+
+        <div class="col-md-6">
+            <h2>Action</h2>
+
+            <button id="add_a_worker">
+                Add a worker
+            </button>
+            <button id="logout">
+                Log out
+            </button>
+        </div>
+
+        <div class="col-md-12">
+            <h2>Modules</h2>
+
+            <table id="modules">
+            </table>
+        </div>
+
+        <div class="col-md-12">
+            <h2>Log</h2>
+
+            <button id="refresh_logs">
+                Refresh
+            </button>
+
+            <table id="logs">
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function readCookie(name) {
+        var nameEQ = encodeURIComponent(name) + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ')
+                c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0)
+                return decodeURIComponent(c.substring(nameEQ.length, c.length));
+        }
+        return null;
+    }
+
+    function eraseCookie(name) {
+        var date = new Date();
+        date.setTime(date.getTime() + (-1 * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+        document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent("") + expires + "; path=/";
+    }
+
+    function getCron() {
+        $.ajax({
+            url: 'log/get_cron_log',
+            type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                var content = "";
+
+                for (var i = 0; i < response.items.length; i++) {
+                    content += "<tr>";
+                    content += "<td>" + response.items[i].request + "</td>";
+                    content += "<td>" + response.items[i].status_code + "</td>";
+                    content += "<td>" + response.items[i].status_description + "</td>";
+                    content += "<td>" + response.items[i].sys_date + "</td>";
+                    content += "</tr>";
+                }
+
+                $("#logs").html(content);
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    };
+
+    function loadRunModuleEvents() {
+        $(".run_module").click(function() {
+            $.ajax({
+                url: 'module/run_module',
+                type: 'POST',
+                xhrFields: {
+                    withCredentials: true
+                },
+                data: JSON.stringify({'module': $(this).attr("module")}),
+                contentType: 'application/json',
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+    }
+
+    function getModules() {
+        $.ajax({
+            url: 'module/get_modules',
+            type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(response) {
+                var content = "";
+
+                for (var i = 0; i < response.length; i++) {
+                    content += "<tr>";
+                    content += "<td>" + response[i].class + "</td>";
+                    content += "<td>" + response[i].cron + "</td>";
+                    content += "<td><button class='run_module' module='" + response[i].class + "'>"
+                        + "Run module"
+                        + "</button></td>";
+                    content += "</tr>";
+                }
+
+                $("#modules").html(content);
+                loadRunModuleEvents();
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $("#add_a_worker").click(function() {
+            $.ajax({
+                url: 'engine/add_worker',
+                type: 'POST',
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+
+        $("#refresh_logs").click(function() {
+            getCron();
+        });
+
+        $("#logout").click(function() {
+            eraseCookie("access_token_cookie");
+            $("#app").css({"display": "none"});
+            $("#login").css({"display": "block"});
+        });
+
+        if (readCookie("access_token_cookie") && readCookie("access_token_cookie").length > 0) {
+            getModules();
+            getCron();
+            $("#app").css({"display": "block"});
+            $("#login").css({"display": "none"});
+        } else {
+            $("#app").css({"display": "none"});
+            $("#login").css({"display": "block"});
+        }
+    });
+
+</script>
+
+{% endblock %}

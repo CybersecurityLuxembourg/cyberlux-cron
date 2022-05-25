@@ -12,6 +12,8 @@ def _getenv(key, default=None, mandatory=True):
 ENVIRONMENT         = _getenv('ENVIRONMENT',    default='dev')
 PORT                = _getenv('PORT', default=5001)
 
+JWT_SECRET_KEY      = _getenv('JWT_SECRET_KEY', mandatory=True)
+
 DB_CONFIG = {
     'drivername':   _getenv('DB_DRIVER',    default='mysql+pymysql'),
     'host':         _getenv('DB_HOSTNAME',  default='localhost'),

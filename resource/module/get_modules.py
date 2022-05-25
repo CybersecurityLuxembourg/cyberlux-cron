@@ -15,8 +15,8 @@ class GetModules(MethodResource, Resource):
         self.db = db
 
     @doc(tags=['module'])
-    # @jwt_required
-    # @verify_admin_access
+    @jwt_required
+    @verify_admin_access
     @catch_exception
     def get(self):
 
