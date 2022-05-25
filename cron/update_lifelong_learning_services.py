@@ -1,6 +1,5 @@
 import copy
 import json
-import re
 from urllib3 import ProxyManager
 from urllib import request
 from flask import Response
@@ -171,5 +170,3 @@ class UpdateLifelongLearningServices:
             description = description[:-3]
 
         return description
-
-

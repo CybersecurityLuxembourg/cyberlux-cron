@@ -27,7 +27,7 @@ class GetCronLog(MethodResource, Resource):
     def get(self, **kwargs):
 
         query = self.db.session.query(self.db.tables["Log"]) \
-            .filter(self.db.tables["Log"].request.like(f"%cron%"))
+            .filter(self.db.tables["Log"].request.like("%cron%"))
 
         if "order" in kwargs and kwargs["order"] == "desc":
             query = query.order_by(self.db.tables["Log"].sys_date.desc())

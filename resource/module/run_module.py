@@ -42,7 +42,7 @@ class RunModule(MethodResource, Resource):
             else:
                 package = importlib.reload(importlib.import_module(package_name))
             module_class = getattr(package, class_name)
-        except:
+        except Exception:
             return "", "422 The specified module has not been found"
 
         config = {

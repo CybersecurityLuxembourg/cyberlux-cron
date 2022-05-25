@@ -1,8 +1,6 @@
 from flask_restful import Resource
 from flask import make_response, render_template
 from resource.healthz import Healthz
-from resource.engine.get_thread_count import GetThreadCount
-from resource.engine.get_worker_count import GetWorkerCount
 from db.db import DB
 
 
