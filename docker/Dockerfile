@@ -21,11 +21,11 @@ COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
 COPY db             /app/db
+COPY cron           /app/cron
 COPY decorator      /app/decorator
-COPY exception      /app/exception
-COPY migrations     /app/migrations
+COPY engine      /app/engine
 COPY resource       /app/resource
-COPY template       /app/template
+COPY templates      /app/templates
 COPY utils          /app/utils
 
 COPY routes.py      /app/

@@ -1,18 +1,6 @@
 version: "3"
 services:
-  cyberlux-db:
-    image: mysql:8.0
-    restart: always
-    volumes:
-      - ./run/database:/var/lib/mysql
-      - ../db/sql/:/docker-entrypoint-initdb.d/:ro
-    environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_DATABASE: "CYBERLUX"
-      MYSQL_USER: "cyberlux"
-      MYSQL_PASSWORD: "cyberlux-pwd"
-  openxeco-api:
+  cyberlux-cron:
     image: "cyberlux-cron:latest"
     restart: always
     ports:
@@ -24,7 +12,3 @@ services:
       DB_USERNAME: "cyberlux"
       DB_PASSWORD: "cyberlux-pwd"
       JWT_SECRET_KEY: "some_random_secret"
-      MAIL_DEFAULT_SENDER: "cyberlux@localhost.localdomain"
-      INITIAL_ADMIN_EMAIL: "your.email@localhost.localdomain"
-    depends_on:
-      - cyberlux-db
