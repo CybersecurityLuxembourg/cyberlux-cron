@@ -7,6 +7,7 @@ from resource.account.login import Login
 from resource.engine.add_worker import AddWorker
 from resource.engine.get_thread_count import GetThreadCount
 from resource.engine.get_worker_count import GetWorkerCount
+from resource.healthz import Healthz
 from resource.log.get_cron_log import GetCronLog
 from resource.module.get_modules import GetModules
 from resource.module.run_module import RunModule
