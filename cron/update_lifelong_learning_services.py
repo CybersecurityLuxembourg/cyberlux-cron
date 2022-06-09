@@ -36,6 +36,7 @@ class UpdateLifelongLearningServices:
             "modified": 0,
             "deactivated": 0
         }
+        treated_ids = []
 
         # Get the Moovijob company
 
@@ -72,16 +73,18 @@ class UpdateLifelongLearningServices:
         )
 
         for source_service in data["trainings"]:
+            if source_service["id"] not in treated_ids:
+                treated_ids.append(source_service["id"])
 
-            db_article = [a for a in db_services if str(source_service["id"]) == a.external_reference]
-            db_article = db_article[0] if len(db_article) > 0 else self.db.tables["Article"]()
+                db_article = [a for a in db_services if str(source_service["id"]) == a.external_reference]
+                db_article = db_article[0] if len(db_article) > 0 else self.db.tables["Article"]()
 
-            count["reviewed"] += 1
-            count["created"] += 1 if db_article.id is None else 0
+                count["reviewed"] += 1
+                count["created"] += 1 if db_article.id is None else 0
 
-            db_article, m1 = self._manage_service(db_article, source_service, entity, training_tag)
+                db_article, m1 = self._manage_service(db_article, source_service, entity, training_tag)
 
-            count["modified"] += 1 if (db_article.id is not None and m1) else 0
+                count["modified"] += 1 if (db_article.id is not None and m1) else 0
 
         # Deactivate the missing services
 
