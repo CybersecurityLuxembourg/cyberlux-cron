@@ -107,7 +107,6 @@
                 data: JSON.stringify({'module': $(this).attr("module")}),
                 contentType: 'application/json',
                 success: function(response) {
-                    console.log(response);
                 },
                 error: function(error){
                     console.log(error);
@@ -154,7 +153,6 @@
                     withCredentials: true
                 },
                 success: function(response) {
-                    console.log(response);
                 },
                 error: function(error){
                     console.log(error);

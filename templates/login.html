@@ -50,7 +50,6 @@
             }),
             contentType: 'application/json',
             success: function(response) {
-                console.log(response);
                 createCookie("access_token_cookie", response.access_token, 1);
                 getModules();
                 getCron();
