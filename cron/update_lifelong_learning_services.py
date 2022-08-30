@@ -38,10 +38,10 @@ class UpdateLifelongLearningServices:
         }
         treated_ids = []
 
-        # Get the Moovijob company
+        # Get the INFPC entity
 
-        entity = self.db.session.query(self.db.tables["Company"]) \
-            .filter(func.lower(self.db.tables["Company"].name).like("%INFPC%")) \
+        entity = self.db.session.query(self.db.tables["Entity"]) \
+            .filter(func.lower(self.db.tables["Entity"].name).like("%INFPC%")) \
             .all()
 
         if len(entity) == 0:
@@ -120,30 +120,30 @@ class UpdateLifelongLearningServices:
 
         # Add the Moovijob relationship if it does not exist
 
-        tags = self.db.get(self.db.tables["ArticleCompanyTag"], {"company": entity.id, "article": article.id})
+        tags = self.db.get(self.db.tables["ArticleEntityTag"], {"entity_id": entity.id, "article_id": article.id})
 
         if len(tags) == 0:
-            self.db.insert({"company": entity.id, "article": article.id}, self.db.tables["ArticleCompanyTag"])
+            self.db.insert({"entity_id": entity.id, "article_id": article.id}, self.db.tables["ArticleEntityTag"])
 
         # Add the Training tag if it does not exist
 
         tags = self.db.get(
             self.db.tables["ArticleTaxonomyTag"],
-            {"taxonomy_value": training_tag.id, "article": article.id}
+            {"taxonomy_value_id": training_tag.id, "article_id": article.id}
         )
 
         if len(tags) == 0:
             self.db.insert(
-                {"taxonomy_value": training_tag.id, "article": article.id},
+                {"taxonomy_value_id": training_tag.id, "article_id": article.id},
                 self.db.tables["ArticleTaxonomyTag"]
             )
 
         return article, is_modified
 
     def _deactivate_deprecated_services(self, entity, external_references):
-        subquery = self.db.session.query(self.db.tables["ArticleCompanyTag"]) \
-            .with_entities(self.db.tables["ArticleCompanyTag"].article) \
-            .filter(self.db.tables["ArticleCompanyTag"].company == entity.id) \
+        subquery = self.db.session.query(self.db.tables["ArticleEntityTag"]) \
+            .with_entities(self.db.tables["ArticleEntityTag"].article_id) \
+            .filter(self.db.tables["ArticleEntityTag"].entity_id == entity.id) \
             .subquery()
 
         offers_to_archive = self.db.session.query(self.db.tables["Article"]) \
@@ -162,12 +162,12 @@ class UpdateLifelongLearningServices:
     def _get_description(source):
         description = ""
 
-        if source["company"] is not None and len(source["company"]) > 0:
-            description += f"Company: {source['company']} \u2014 "
+        if source["entity"] is not None and len(source["entity"]) > 0:
+            description += f"Entity: {source['entity']} \u2014 "
         if source["durationInHours"] is not None and len(str(source["durationInHours"])) > 0:
             description += f"Duration in hours: {str(source['durationInHours'])} \u2014 "
         if source["trainingLevelTitle"] is not None and len(source["trainingLevelTitle"]) > 0:
-            description += f"Level: {source['company']} \u2014 "
+            description += f"Level: {source['entity']} \u2014 "
 
         if len(description) > 0:
             description = description[:-3]

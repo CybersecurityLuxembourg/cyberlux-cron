@@ -46,18 +46,18 @@ class UpdateMoovijobJobOffers:
         if nb_pages is None:
             return [], "500 No article has been treated"
 
-        # Get the Moovijob company
+        # Get the Moovijob entity
 
-        company = self.db.session.query(self.db.tables["Company"]) \
-            .filter(func.lower(self.db.tables["Company"].name).like("%moovijob%")) \
+        entity = self.db.session.query(self.db.tables["Entity"]) \
+            .filter(func.lower(self.db.tables["Entity"].name).like("%moovijob%")) \
             .all()
 
-        if len(company) == 0:
-            return [], "500 Moovijob company not found"
-        if len(company) > 1:
-            return [], "500 Too many Moovijob company found"
+        if len(entity) == 0:
+            return [], "500 Moovijob entity not found"
+        if len(entity) > 1:
+            return [], "500 Too many Moovijob entity found"
 
-        company = company[0]
+        entity = entity[0]
 
         # process page
 
@@ -76,7 +76,7 @@ class UpdateMoovijobJobOffers:
                 count["reviewed"] += 1
                 count["created"] += 1 if db_article.id is None else 0
 
-                db_article, m1 = self._manage_article(db_article, source_article, company)
+                db_article, m1 = self._manage_article(db_article, source_article, entity)
                 db_article_version, m2 = self._manage_article_version(db_article)
                 _, m3 = self._manage_article_version_box(db_article_version, source_article)
 
@@ -99,7 +99,7 @@ class UpdateMoovijobJobOffers:
 
         # Deactivate the missing offers
 
-        self._deactivate_deprecated_offers(company, external_references)
+        self._deactivate_deprecated_offers(entity, external_references)
 
         # Send response
 
@@ -108,7 +108,7 @@ class UpdateMoovijobJobOffers:
 
         return Response(status=status)
 
-    def _manage_article(self, a, source, company):
+    def _manage_article(self, a, source, entity):
         copied_a = copy.deepcopy(a)
 
         title = self._get_preferred_lang_info(source['title'])
@@ -132,10 +132,10 @@ class UpdateMoovijobJobOffers:
 
         # Add the Moovijob relationship if it does not exist
 
-        tags = self.db.get(self.db.tables["ArticleCompanyTag"], {"company": company.id, "article": article.id})
+        tags = self.db.get(self.db.tables["ArticleEntityTag"], {"entity_id": entity.id, "article_id": article.id})
 
         if len(tags) == 0:
-            self.db.insert({"company": company.id, "article": article.id}, self.db.tables["ArticleCompanyTag"])
+            self.db.insert({"entity_id": entity.id, "article_id": article.id}, self.db.tables["ArticleEntityTag"])
 
         return article, is_modified
 
@@ -171,10 +171,10 @@ class UpdateMoovijobJobOffers:
 
         return None, False
 
-    def _deactivate_deprecated_offers(self, company, external_references):
-        subquery = self.db.session.query(self.db.tables["ArticleCompanyTag"]) \
-            .with_entities(self.db.tables["ArticleCompanyTag"].article) \
-            .filter(self.db.tables["ArticleCompanyTag"].company == company.id) \
+    def _deactivate_deprecated_offers(self, entity, external_references):
+        subquery = self.db.session.query(self.db.tables["ArticleEntityTag"]) \
+            .with_entities(self.db.tables["ArticleEntityTag"].article_id) \
+            .filter(self.db.tables["ArticleEntityTag"].entity_id == entity.id) \
             .subquery()
 
         offers_to_archive = self.db.session.query(self.db.tables["Article"]) \
