@@ -99,7 +99,7 @@ class UpdateMoovijobJobOffers:
 
         # Deactivate the missing offers
 
-        self._deactivate_deprecated_offers(entity, external_references)
+        count["deactivated"] = self._deactivate_deprecated_offers(entity, external_references)
 
         # Send response
 
@@ -121,7 +121,7 @@ class UpdateMoovijobJobOffers:
         a.handle = handle if a.handle is None else a.handle
         a.type = "JOB OFFER" if a.type is None else a.type
         a.publication_date = source["published_at"].split("T")[0] if a.publication_date is None else a.publication_date
-        a.status = "PUBLIC" if a.status is None else a.status
+        a.status = "PUBLIC"
         a.link = self._get_preferred_lang_info(source["urls"]) if a.link is None else a.link
         a.is_created_by_admin = True
 
@@ -188,6 +188,8 @@ class UpdateMoovijobJobOffers:
                 o.status = "ARCHIVE"
 
             self.db.merge(offers_to_archive, self.db.tables["Article"])
+
+        return len(offers_to_archive)
 
     @staticmethod
     def _get_preferred_lang_info(lang_dict):
